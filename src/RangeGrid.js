@@ -22,9 +22,9 @@ const RangeGrid = () => {
     // Try to load saved tag names from localStorage
     const savedTagNames = localStorage.getItem('tagNames');
     return savedTagNames ? JSON.parse(savedTagNames) : {
-      green: 'Green',
-      red: 'Red',
-      yellow: 'Yellow'
+      green: 'Openraise',
+      yellow: 'Limp',
+      red: 'Fold ICM'
     };
   });
 
@@ -94,9 +94,9 @@ const RangeGrid = () => {
       return `${card1}${card1}`; // Pocket pairs
     }
     if (row > col) {
-      return `${card2}${card1}o`; // Offsuit hands above diagonal
+      return `${card2}${card1}o`; // Offsuit hands - higher card first (col, row)
     }
-    return `${card2}${card1}s`; // Suited hands below diagonal
+    return `${card1}${card2}s`; // Suited hands - higher card first
   };
 
   // Helper to determine if cell should be shown
@@ -383,9 +383,9 @@ const RangeGrid = () => {
           <h3>Tags</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {[
-              { color: 'green', defaultName: 'Green' },
-              { color: 'red', defaultName: 'Red' },
-              { color: 'yellow', defaultName: 'Yellow' }
+              { color: 'green', defaultName: 'Openraise' },
+              { color: 'yellow', defaultName: 'Limp' },
+              { color: 'red', defaultName: 'Fold ICM' }
             ].map(({ color, defaultName }) => (
               <div key={color} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <button 
