@@ -45,9 +45,9 @@ const RangeGrid = () => {
     for (let i = 0; i < labels.length - 1; i++) {
       for (let j = i + 1; j < labels.length; j++) {
         // Add suited hands first (stronger)
-        rankings.push({ row: j, col: i });
-        // Then add offsuit hands (weaker)
         rankings.push({ row: i, col: j });
+        // Then add offsuit hands (weaker)
+        rankings.push({ row: j, col: i });
       }
     }
 
@@ -93,10 +93,10 @@ const RangeGrid = () => {
     if (row === col) {
       return `${card1}${card1}`; // Pocket pairs
     }
-    if (row < col) {
-      return `${card1}${card2}o`; // Offsuit hands below diagonal
+    if (row > col) {
+      return `${card2}${card1}o`; // Offsuit hands above diagonal
     }
-    return `${card1}${card2}s`; // Suited hands above diagonal
+    return `${card2}${card1}s`; // Suited hands below diagonal
   };
 
   // Helper to determine if cell should be shown
