@@ -8,7 +8,7 @@ const RangeGrid = () => {
   const [grid, setGrid] = useState(() => {
     // Try to load saved grid from localStorage on initial render
     const savedGrid = localStorage.getItem('pokerRange');
-    return savedGrid ? JSON.parse(savedGrid) : Array(13).fill(null).map(() => Array(13).fill(null));
+    return savedGrid ? JSON.parse(savedGrid) : Array(13).fill(null).map(() => Array(13).fill([]));
   });
   const [selectedColor, setSelectedColor] = useState('green'); // Default tag color
   const [isMouseDown, setIsMouseDown] = useState(false);
@@ -56,14 +56,14 @@ const RangeGrid = () => {
 
   // Update grid based on percentage
   const updateGridByPercentage = (percent) => {
-    const newGrid = Array(13).fill(null).map(() => Array(13).fill(null));
+    const newGrid = Array(13).fill(null).map(() => Array(13).fill([]));
     const totalHands = handRankings.length;
     const handsToColor = Math.floor((percent / 100) * totalHands);
 
     // Color the top X% of hands
     for (let i = 0; i < handsToColor; i++) {
       const { row, col } = handRankings[i];
-      newGrid[row][col] = selectedColor;
+      newGrid[row][col] = [selectedColor];
     }
 
     setGrid(newGrid);
@@ -79,9 +79,19 @@ const RangeGrid = () => {
   // Modified cell click handler to toggle color
   const handleCellClick = (row, col) => {
     const newGrid = [...grid];
-    // If cell already has the selected color, remove it
-    // Otherwise, apply the selected color
-    newGrid[row][col] = grid[row][col] === selectedColor ? null : selectedColor;
+    const currentColors = newGrid[row][col] || [];
+    
+    if (currentColors.includes(selectedColor)) {
+      // Remove the color if it's already there
+      newGrid[row][col] = currentColors.filter(color => color !== selectedColor);
+    } else if (currentColors.length < 2) {
+      // Add the color if we have less than 2 colors
+      newGrid[row][col] = [...currentColors, selectedColor];
+    } else {
+      // If we already have 2 colors, replace the first one (FIFO)
+      newGrid[row][col] = [currentColors[1], selectedColor];
+    }
+    
     setGrid(newGrid);
   };
 
@@ -140,7 +150,7 @@ const RangeGrid = () => {
 
   // Clear the current range
   const handleClear = () => {
-    setGrid(Array(13).fill(null).map(() => Array(13).fill(null)));
+    setGrid(Array(13).fill(null).map(() => Array(13).fill([])));
     localStorage.removeItem('pokerRange');
   };
 
@@ -188,7 +198,11 @@ const RangeGrid = () => {
               style={{
                 width: '4px',
                 height: '4px',
-                backgroundColor: cell || 'white',
+                background: cell?.length === 2 
+                  ? `linear-gradient(45deg, ${cell[0]} 50%, ${cell[1]} 50%)`
+                  : cell?.length === 1 
+                    ? cell[0]
+                    : 'white',
               }}
             />
           ))
@@ -314,13 +328,18 @@ const RangeGrid = () => {
                         width: 30,
                         height: 30,
                         border: '1px solid black',
-                        backgroundColor: grid[row][col] || 'white',
+                        background: grid[row][col]?.length === 2 
+                          ? `linear-gradient(45deg, ${grid[row][col][0]} 50%, ${grid[row][col][1]} 50%)`
+                          : grid[row][col]?.length === 1 
+                            ? grid[row][col][0]
+                            : 'white',
                         cursor: 'pointer',
                         fontSize: '10px',
+                        fontWeight: 'bold',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        userSelect: 'none', // Prevent text selection while dragging
+                        userSelect: 'none',
                       }}
                     >
                       {getCellContent(row, col)}
