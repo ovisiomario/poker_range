@@ -113,7 +113,7 @@ const RangeGrid = () => {
 
     const newSavedRanges = {
       ...savedRanges,
-      [rangeName]: grid
+      [rangeName]: JSON.parse(JSON.stringify(grid)) // Create a deep copy of the grid
     };
 
     localStorage.setItem('rangeLibrary', JSON.stringify(newSavedRanges));
@@ -126,7 +126,7 @@ const RangeGrid = () => {
   const handleLoadRange = (name) => {
     const rangeToLoad = savedRanges[name];
     if (rangeToLoad) {
-      setGrid(rangeToLoad);
+      setGrid(JSON.parse(JSON.stringify(rangeToLoad))); // Create a deep copy when loading
     }
   };
 
